@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Collector::VERSION
   spec.authors       = ["Felix Holmgren"]
   spec.email         = ["felix.holmgren@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Client for the Collector API}
+  spec.summary       = %q{Just starting out}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -18,6 +18,14 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.add_runtime_dependency "vanguard"
+  spec.add_runtime_dependency "virtus", ">= 0.5.0"
+  spec.add_runtime_dependency "representable"
+
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec", "~> 2.13"
+  spec.add_development_dependency "require_all"
+  spec.add_development_dependency "webmock"
+  spec.add_development_dependency "vcr"
 end

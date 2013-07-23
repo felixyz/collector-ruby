@@ -1,0 +1,4 @@
+Autotest.add_hook(:initialize) do |at|
+  %w{.git coverage log fixtures}.each {|exception| at.add_exception(exception)}
+  at.prefix = "bundle exec "
+end
