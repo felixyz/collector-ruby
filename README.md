@@ -2,7 +2,7 @@
 
 This gem provides an interface to the Collector API.
 
-__Important__: The gem depends on the unfinished version 3 of Savon, and therefore users of this gem must also include this in their Gemfile:
+__Important__: `collector-ruby` depends on the unfinished version 3 of Savon, and therefore users of this gem must also include this in their Gemfile:
 
     gem 'savon', :github => "savonrb/savon", :branch => "master"
 
@@ -11,15 +11,11 @@ __Important__: The gem depends on the unfinished version 3 of Savon, and therefo
 
 Add this line to your application's Gemfile:
 
-    gem 'collector-ruby'
+    gem 'collector-ruby', :github => "blingo/collector-ruby", :branch => "master"
 
 And then execute:
 
     $ bundle
-
-Or install it yourself as:
-
-    $ gem install collector-ruby
 
 ## Usage
 
