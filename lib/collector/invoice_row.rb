@@ -12,7 +12,7 @@ module Collector
     property :description,  as: "Description"
     property :quantity,     as: "Quantity"
     property :unit_price,   as: "UnitPrice"
-    property :vat,          as: "Vat"
+    property :vat,          as: "VAT"
   end
 
 end

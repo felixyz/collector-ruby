@@ -82,6 +82,7 @@ describe Collector::Client do
       @invoice_row['lol0:Description'].should   eq    'A wonderful thing'
       @invoice_row['lol0:Quantity'].should      eq    '2'
       @invoice_row['lol0:UnitPrice'].should     eq    '12.0'
+      @invoice_row['lol0:VAT'].should          eq    '2.0'
     end
 
   end
