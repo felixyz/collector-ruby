@@ -20,8 +20,32 @@ describe Collector::Client do
       response.invoice_status.should_not be_nil
     end
   end
-  context "SOAP query" do
 
+  context "incomplete request" do
+    it "raises an exception" do
+      @incomplete_req = sandbox_invoice_request
+      @incomplete_req.activation_option = nil
+      @incomplete_req.store_id = nil
+      expect { @client.add_invoice(@incomplete_req)}.to raise_error ArgumentError
+    end
+    it "raises an exception when nested objects are incomplete" do
+      @incomplete_req = sandbox_invoice_request
+      @incomplete_req.delivery_address.address1 = nil
+      expect { @client.add_invoice(@incomplete_req)}.to raise_error ArgumentError
+    end
+    it "lists the missing attributes" do
+      @incomplete_req = sandbox_invoice_request
+      @incomplete_req.activation_option = nil
+      @incomplete_req.delivery_address.address1 = nil
+      @incomplete_req.invoice_rows.first.article_id = nil
+      begin
+        @client.add_invoice(@incomplete_req)
+      rescue => e
+        e.message.should eq "Missing attributes: activation_option, delivery_address.address1, invoice_rows[0].article_id"
+      end
+    end
+  end
+  context "SOAP query" do
     before :each do
       WebMock.after_request do |request_signature, response|
         @req_headers = request_signature.headers
@@ -53,7 +77,7 @@ describe Collector::Client do
       @soap_request['lol0:StoreId'].should eq "355"
       @soap_request['lol0:OrderDate'].should be_kind_of DateTime
       @soap_request['lol0:OrderDate'].to_time.to_f.should be_within(1).of(DateTime.now.to_time.to_f)
-      end
+    end
 
     it "includes the DeliveryAddress" do
       @address = @soap_request['lol0:DeliveryAddress']

@@ -22,6 +22,9 @@ module Collector
 
     AddInvoiceNamespace = :add_invoice_response_v31
     def add_invoice(invoice_request)
+      unless invoice_request.has_required_attributes?
+        raise ArgumentError.new(invoice_request.missing_attributes_human_readable)
+      end
       operation = operation_with_name :AddInvoice
       operation.body = Collector::InvoiceRequestRepresenter.new(invoice_request).to_hash
       response = operation.call.body
