@@ -27,4 +27,19 @@ describe Collector::Address do
     obj2.should eq obj
   end
 
+  it "reports that all required attributes are present if they are" do
+    full_address = Collector::Address.new( address_hash )
+    full_address.should have_required_attributes
+    full_address.missing_attributes.should be_empty
+  end
+
+  it "reports missing attributes" do
+    incomplete = address_hash.dup
+    incomplete.delete(:address1)
+    incomplete.delete(:last_name)
+    incomplete_address = Collector::Address.new( incomplete )
+    incomplete_address.should_not have_required_attributes
+    incomplete_address.missing_attributes.should eq [:address1, :last_name]
+  end
+
 end

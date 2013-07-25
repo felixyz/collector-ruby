@@ -3,6 +3,7 @@
 # Hashes
 def sandbox_user_address_hash
   { address1: "GATUADRESSAKT211",
+    address2: "Not required",
     city: "UMEÅ",
     country_code: "SE",
     postal_code: "90737",
@@ -43,4 +44,40 @@ end
 
 def sandbox_invoice_request
   Collector::InvoiceRequest.new(sandbox_invoice_request_hash)
+end
+
+def full_address_hash
+  sandbox_user_address_hash.merge({
+        address2: "not required",
+        co_address: "not required",
+        cell_phone_number: "not required",
+        # company_name: "not required",   # Can't test. Sandbox user is a "private customer"
+        email: "not@required.se",
+        phone_number: "not required"
+      })
+end
+
+def full_sandbox_address
+  Collector::Address.new(full_address_hash)
+end
+
+def full_invoice_request_hash
+  sandbox_invoice_request_hash.merge({
+        correlation_id: "test corr id",
+        cost_center: "not required",
+        credit_time: 10,
+        customer_no: "not required",
+        delivery_address: full_sandbox_address,
+        gender: 0,
+        invoice_address: full_sandbox_address,
+        order_no: "not required",
+        # product_code: "",  # Can't test, defined by Collector, requires agreement
+        purchase_type: 0,
+        reference: "not required",
+        sales_person: "not required"
+      })
+end
+
+def full_sandbox_invoice_request
+  Collector::InvoiceRequest.new(full_invoice_request_hash)
 end

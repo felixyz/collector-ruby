@@ -11,7 +11,6 @@ describe Collector::Client do
       @client = Collector.new(user_name, password)
     end
   end
-
   it "performs an AddInvoice request" do
     VCR.use_cassette('add_invoice') do
       response = @client.add_invoice(sandbox_invoice_request)
@@ -20,7 +19,17 @@ describe Collector::Client do
       response.invoice_status.should_not be_nil
     end
   end
-
+  context "with all optional fields set" do
+    it "performs an AddInvoice request" do
+      VCR.use_cassette('add_invoice_all_fields') do
+        response = @client.add_invoice(full_sandbox_invoice_request)
+        response.should be_kind_of Collector::AddInvoiceResponse
+        response.invoice_no.should_not be_nil
+        response.invoice_status.should_not be_nil
+        response.correlation_id.should eq "test corr id"
+      end
+    end
+  end # with all optional fields set
   context "incomplete request" do
     it "raises an exception" do
       @incomplete_req = sandbox_invoice_request
@@ -44,7 +53,7 @@ describe Collector::Client do
         e.message.should eq "Missing attributes: activation_option, delivery_address.address1, invoice_rows[0].article_id"
       end
     end
-  end
+  end # incomplete request
   context "SOAP query" do
     before :each do
       WebMock.after_request do |request_signature, response|
@@ -60,13 +69,11 @@ describe Collector::Client do
         @client.add_invoice(sandbox_invoice_request)
       end
     end
-
     it "sets the headers" do
       @soap_header['lol0:Password'].should eq "blingo_test"
       @soap_header['lol0:Username'].should eq "blingo_test"
       # @soap_header['lol0:ClientIpAddress'].should eq
     end
-
     it "includes all parameters in request" do
       @soap_request['lol0:ActivationOption'].should eq "0"
       @soap_request['lol0:CountryCode'].should eq "SE"
@@ -78,27 +85,26 @@ describe Collector::Client do
       @soap_request['lol0:OrderDate'].should be_kind_of DateTime
       @soap_request['lol0:OrderDate'].to_time.to_f.should be_within(1).of(DateTime.now.to_time.to_f)
     end
-
     it "includes the DeliveryAddress" do
       @address = @soap_request['lol0:DeliveryAddress']
       @address['lol0:Address1'].should      eq    'GATUADRESSAKT211'
+      @address['lol0:Address2'].should      eq    'Not required'
       @address['lol0:City'].should          eq    'UMEÅ'
       @address['lol0:CountryCode'].should   eq    'SE'
       @address['lol0:PostalCode'].should    eq    '90737'
       @address['lol0:Firstname'].should     eq    'FÖRNAMNAKT211'
       @address['lol0:Lastname'].should      eq    'EFTERNAMNAKT211'
     end
-
     it "includes the InvoiceAddress" do
       @address = @soap_request['lol0:InvoiceAddress']
       @address['lol0:Address1'].should      eq    'GATUADRESSAKT211'
+      @address['lol0:Address2'].should      eq    'Not required'
       @address['lol0:City'].should          eq    'UMEÅ'
       @address['lol0:CountryCode'].should   eq    'SE'
       @address['lol0:PostalCode'].should    eq    '90737'
       @address['lol0:Firstname'].should     eq    'FÖRNAMNAKT211'
       @address['lol0:Lastname'].should      eq    'EFTERNAMNAKT211'
     end
-
     it "includes the InvoiceRows" do
       @invoice_rows = @soap_request['lol0:InvoiceRows']
       @invoice_row = @invoice_rows['lol0:InvoiceRow']
@@ -108,6 +114,5 @@ describe Collector::Client do
       @invoice_row['lol0:UnitPrice'].should     eq    '12.0'
       @invoice_row['lol0:VAT'].should          eq    '2.0'
     end
-
-  end
+  end # SOAP query
 end
