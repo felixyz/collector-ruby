@@ -1,6 +1,7 @@
 module Collector
 
   class BaseModel
+    @swallow_unsupported_attributes = false
 
     class << self
       def attributes(*args)
@@ -16,6 +17,14 @@ module Collector
 
       alias_method :attribute, :attributes
       alias_method :attribute_opt, :attributes_opt
+
+      def swallow_unsupported_attributes
+        @swallow_unsupported_attributes = true
+      end
+
+      def swallow_unsupported_attributes?
+        @swallow_unsupported_attributes
+      end
     end
 
     def attributes
@@ -30,7 +39,15 @@ module Collector
       attributes + attributes_opt
     end
 
+    def validate_input(hash)
+      unsupported_keys = hash.keys.map(&:to_sym) - all_attributes
+      unless unsupported_keys.empty?
+        raise ArgumentError.new("Unsupported attribute(s): #{unsupported_keys}")
+      end
+    end
+
     def initialize(hash = {})
+      validate_input(hash) unless self.class.swallow_unsupported_attributes?
       all_attributes.each do |attr|
         val = hash[attr] || hash[attr.to_s]
         self.send("#{attr}=", val)

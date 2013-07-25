@@ -10,7 +10,19 @@ class NestedModel < Collector::BaseModel
   attribute_opt :optional
 end
 
+class TolerantModel < Collector::BaseModel
+  swallow_unsupported_attributes
+end
+
 describe Collector::BaseModel do
+  it "raises an error when initialized with undeclared attributes" do
+    expect{ Model.new(required1: true,
+                      required2: true,
+                      unsupported: true)}.to raise_error ArgumentError
+  end
+  it "does not raise an error for undeclared attributes if set to swallow those" do
+    expect{ TolerantModel.new(humbug: true) }.not_to raise_error
+  end
   it "reports presence of required attributes" do
     obj = Model.new(required1: true, required2: true)
     obj.should have_required_attributes

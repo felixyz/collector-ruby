@@ -2,6 +2,8 @@ require 'representable/hash'
 
 module Collector
   class AddInvoiceResponse < BaseModel
+    swallow_unsupported_attributes  # Accept unknown attributes returned from service
+
     attributes :available_reservation_amount, :correlation_id, :due_date,
                   :invoice_no, :invoice_status, :invoice_url,
                   :lowest_amount_to_pay, :payment_reference, :total_amount
