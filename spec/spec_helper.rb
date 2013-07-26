@@ -16,3 +16,13 @@ end
 RSpec.configure do |config|
   # config.filter_run focus: true
 end
+
+def collector_client
+  user_name = 'blingo_test'
+  password = 'blingo_test'
+  client = nil
+  VCR.use_cassette('create_client') do
+    client = Collector.new(user_name, password)
+  end
+  client
+end

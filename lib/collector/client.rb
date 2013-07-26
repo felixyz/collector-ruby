@@ -26,7 +26,7 @@ module Collector
         raise ArgumentError.new(invoice_request.missing_attributes_human_readable)
       end
       operation = operation_with_name :AddInvoice
-      operation.body = Collector::InvoiceRequestRepresenter.new(invoice_request).to_hash
+      operation.body = InvoiceRequestRepresenter.new(invoice_request).to_hash
       response = operation.call.body
       # TODO: Exception class, and proper information extraction
       if !response[:fault].nil?

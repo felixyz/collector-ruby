@@ -3,13 +3,9 @@ require 'vcr'
 require 'webmock/rspec'
 require 'nori'  # Available through Savon
 
-describe Collector::Client do
+describe "Collector::Client#add_invoice" do
   before :all do
-    user_name = 'blingo_test'
-    password = 'blingo_test'
-    VCR.use_cassette('create_client') do
-      @client = Collector.new(user_name, password)
-    end
+    @client = collector_client
   end
   it "performs an AddInvoice request" do
     VCR.use_cassette('add_invoice') do
@@ -55,7 +51,7 @@ describe Collector::Client do
     end
   end # incomplete request
   context "SOAP query" do
-    before :each do
+    before :all do
       WebMock.after_request do |request_signature, response|
         @req_headers = request_signature.headers
         @req_body = request_signature.body
@@ -68,6 +64,9 @@ describe Collector::Client do
       VCR.use_cassette('add_invoice') do
         @client.add_invoice(sandbox_invoice_request)
       end
+    end
+    after :all do
+      WebMock::CallbackRegistry.reset
     end
     it "sets the headers" do
       @soap_header['lol0:Password'].should eq "blingo_test"
