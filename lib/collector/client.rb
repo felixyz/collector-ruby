@@ -1,4 +1,5 @@
 require 'savon'
+require 'active_support/core_ext'
 
 module Collector
 
@@ -20,7 +21,6 @@ module Collector
       end
     end
 
-    AddInvoiceNamespace = :add_invoice_response_v31
     def add_invoice(invoice_request)
       unless invoice_request.has_required_attributes?
         raise ArgumentError.new(invoice_request.missing_attributes_human_readable)
@@ -32,11 +32,11 @@ module Collector
       if !response[:fault].nil?
         raise response[:fault].to_s
       end
-      add_invoice_resp = InvoiceResponse.new(response[AddInvoiceNamespace])
+      namespace = response.keys.first
+      add_invoice_resp = InvoiceResponse.new(response[namespace])
       add_invoice_resp
     end
 
-    GetAddressNamespace = :TODO_IMPLEMENT
     def get_address(options)
       raise ArgumentError.new("Required parameter 'reg_no' missing.") unless !!options[:reg_no]
       raise ArgumentError.new("Required parameter 'store_id' missing.") unless !!options[:store_id]
@@ -48,8 +48,11 @@ module Collector
       if !response[:fault].nil?
         raise response[:fault].to_s
       end
-      puts response
-      User.new(response[GetAddressNamespace])
+      namespace = response.keys.first
+      user_hash = response[namespace].with_indifferent_access
+      user = User.new
+      UserRepresenter.new(user).from_hash(user_hash)
+      user
     end
 
     def activate_invoice(options)

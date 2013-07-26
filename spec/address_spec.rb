@@ -36,10 +36,10 @@ describe Collector::Address do
   it "reports missing attributes" do
     incomplete = address_hash.dup
     incomplete.delete(:address1)
-    incomplete.delete(:last_name)
+    incomplete.delete(:postal_code)
     incomplete_address = Collector::Address.new( incomplete )
     incomplete_address.should_not have_required_attributes
-    incomplete_address.missing_attributes.should eq [:address1, :last_name]
+    incomplete_address.missing_attributes.should eq [:address1, :postal_code]
   end
 
 end
