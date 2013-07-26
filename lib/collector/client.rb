@@ -32,7 +32,7 @@ module Collector
       if !response[:fault].nil?
         raise response[:fault].to_s
       end
-      add_invoice_resp = AddInvoiceResponse.new(response[AddInvoiceNamespace])
+      add_invoice_resp = InvoiceResponse.new(response[AddInvoiceNamespace])
       add_invoice_resp
     end
 
@@ -49,7 +49,24 @@ module Collector
         raise response[:fault].to_s
       end
       puts response
-      user = User.new(response[GetAddressNamespace])
+      User.new(response[GetAddressNamespace])
+    end
+
+    def activate_invoice(options)
+      %w(invoice_no store_id country_code).each do |param|
+        if options[param.to_sym].nil?
+          raise ArgumentError.new("Required parameter #{param} missing.")
+        end
+      end
+      request = ActivateInvoiceRequest.new(options)
+      operation = operation_with_name :ActivateInvoice
+      operation.body = ActivateInvoiceRequestRepresenter.new(request).to_hash
+      response = operation.call.body
+      if !response[:fault].nil?
+        raise response[:fault].to_s
+      end
+      namespace = response.keys.first
+      InvoiceResponse.new(response[namespace])
     end
   end
 end

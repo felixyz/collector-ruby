@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Collector::AddInvoiceResponse do
+describe Collector::InvoiceResponse do
   let (:raw_invoice_reponse_hash) {
     {:add_invoice_response_v31=>{:available_reservation_amount=>"0",
                                 :correlation_id=>nil,
@@ -15,7 +15,7 @@ describe Collector::AddInvoiceResponse do
     }
   }
   it "can be constructed from a hash" do
-    inv_resp = Collector::AddInvoiceResponse.new( raw_invoice_reponse_hash[:add_invoice_response_v31] )
+    inv_resp = Collector::InvoiceResponse.new( raw_invoice_reponse_hash[:add_invoice_response_v31] )
     inv_resp.available_reservation_amount.should eq "0"
     inv_resp.correlation_id.should eq nil
     inv_resp.due_date.should eq nil

@@ -10,7 +10,7 @@ describe "Collector::Client#add_invoice" do
   it "performs an AddInvoice request" do
     VCR.use_cassette('add_invoice') do
       response = @client.add_invoice(sandbox_invoice_request)
-      response.should be_kind_of Collector::AddInvoiceResponse
+      response.should be_kind_of Collector::InvoiceResponse
       response.invoice_no.should_not be_nil
       response.invoice_status.should_not be_nil
     end
@@ -19,7 +19,7 @@ describe "Collector::Client#add_invoice" do
     it "performs an AddInvoice request" do
       VCR.use_cassette('add_invoice_all_fields') do
         response = @client.add_invoice(full_sandbox_invoice_request)
-        response.should be_kind_of Collector::AddInvoiceResponse
+        response.should be_kind_of Collector::InvoiceResponse
         response.invoice_no.should_not be_nil
         response.invoice_status.should_not be_nil
         response.correlation_id.should eq "test corr id"

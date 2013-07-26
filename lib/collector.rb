@@ -5,8 +5,9 @@ require "collector/user"
 require "collector/address"
 require "collector/invoice_row"
 require "collector/invoice_request"
+require "collector/activate_invoice_request"
 require "collector/get_address_request"
-require "collector/add_invoice_response"
+require "collector/invoice_response"
 
 module Collector
 
