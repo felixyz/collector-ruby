@@ -50,6 +50,19 @@ describe "Collector::Client#add_invoice" do
       end
     end
   end # incomplete request
+  context "with multiple rows" do
+    it "performs an AddInvoice request" do
+      VCR.use_cassette('add_invoice_multiple_rows') do
+        request = sandbox_invoice_request
+        request.invoice_rows << sandbox_invoice_row
+        request.invoice_rows << sandbox_invoice_row
+        response = @client.add_invoice(request)
+        response.should be_kind_of Collector::InvoiceResponse
+        response.invoice_no.should_not be_nil
+        response.invoice_status.should_not be_nil
+      end
+    end
+  end
   context "SOAP query" do
     before :all do
       WebMock.after_request do |request_signature, response|
