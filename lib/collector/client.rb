@@ -35,5 +35,21 @@ module Collector
       add_invoice_resp = AddInvoiceResponse.new(response[AddInvoiceNamespace])
       add_invoice_resp
     end
+
+    GetAddressNamespace = :TODO_IMPLEMENT
+    def get_address(options)
+      raise ArgumentError.new("Required parameter 'reg_no' missing.") unless !!options[:reg_no]
+      raise ArgumentError.new("Required parameter 'store_id' missing.") unless !!options[:store_id]
+      request = GetAddressRequest.new(options.merge({country_code: "SE"}))
+      req = GetAddressRequestRepresenter.new(request).to_hash
+      operation = operation_with_name :GetAddress
+      operation.body = req
+      response = operation.call.body
+      if !response[:fault].nil?
+        raise response[:fault].to_s
+      end
+      puts response
+      user = User.new(response[GetAddressNamespace])
+    end
   end
 end
