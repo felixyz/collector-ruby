@@ -15,17 +15,17 @@ def sandbox_user_address
   Collector::Address.new(sandbox_user_address_hash )
 end
 
-def sandbox_invoice_row_hash
-  { article_id: 12,
+def sandbox_invoice_row_hash(opts = {})
+  { article_id: "12",
     description: "A wonderful thing",
     quantity: "2",
-    unit_price: 12.0,
-    vat: 2.0
-  }
+    unit_price: "12.0",
+    vat: "2.0"
+  }.merge(opts)
 end
 
-def sandbox_invoice_row
-  Collector::InvoiceRow.new(sandbox_invoice_row_hash)
+def sandbox_invoice_row(opts = {})
+  Collector::InvoiceRow.new(sandbox_invoice_row_hash(opts))
 end
 
 def sandbox_invoice_request_hash

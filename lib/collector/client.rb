@@ -62,14 +62,27 @@ module Collector
         end
       end
       request = ActivateInvoiceRequest.new(options)
-      operation = operation_with_name :ActivateInvoice
-      operation.body = ActivateInvoiceRequestRepresenter.new(request).to_hash
+      operation = nil
+      if request.article_list.nil?
+        operation = operation_with_name :ActivateInvoice
+        operation.body = ActivateInvoiceRequestRepresenter.new(request).to_hash
+      else
+        operation = operation_with_name :PartActivateInvoice
+        operation.body = PartActivateInvoiceRequestRepresenter.new(request).to_hash
+      end
       response = operation.call.body
       if !response[:fault].nil?
         raise response[:fault].to_s
       end
       namespace = response.keys.first
       InvoiceResponse.new(response[namespace])
+    end
+
+    def part_activate_invoice(options)
+      if options[:article_list].nil?
+        raise ArgumentError.new("Required parameter article_list missing.")
+      end
+      activate_invoice(options)
     end
   end
 end
