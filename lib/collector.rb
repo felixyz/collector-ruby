@@ -8,6 +8,7 @@ require "collector/article_list_item"
 
 require "collector/invoice_request"
 require "collector/cancel_invoice_request"
+require "collector/adjust_invoice_request"
 require "collector/activate_invoice_request"
 require "collector/get_address_request"
 require "collector/invoice_response"

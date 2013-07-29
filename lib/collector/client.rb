@@ -9,6 +9,7 @@ module Collector
 
   class InvoiceNotFoundError < RuntimeError ; end
   class InvalidInvoiceStatusError < RuntimeError ; end
+  class InvalidTransactionAmountError < RuntimeError ; end
 
   class Client
     def initialize(user_name, password)
@@ -32,6 +33,8 @@ module Collector
         err_class = InvoiceNotFoundError
       when "s:INVALID_INVOICE_STATUS"
         err_class = InvalidInvoiceStatusError
+      when "s:INVALID_TRANSACTION_AMOUNT"
+        err_class = InvalidTransactionAmountError
       end
       raise err_class.send(:new, fault[:faultstring])
     end
@@ -79,6 +82,40 @@ module Collector
       request = CancelInvoiceRequest.new(options)
       req = CancelInvoiceRequestRepresenter.new(request).to_hash
       operation = operation_with_name :CancelInvoice
+      operation.body = req
+      response = operation.call.body
+      if !response[:fault].nil?
+        raise_error(response)
+      end
+      namespace = response.keys.first
+      response_hash = response[namespace]
+      response_hash[:correlation_id]
+    end
+
+    def cancel_invoice(options)
+      request = CancelInvoiceRequest.new(options)
+      unless request.has_required_attributes?
+        raise ArgumentError.new(request.missing_attributes_human_readable)
+      end
+      req = CancelInvoiceRequestRepresenter.new(request).to_hash
+      operation = operation_with_name :CancelInvoice
+      operation.body = req
+      response = operation.call.body
+      if !response[:fault].nil?
+        raise_error(response)
+      end
+      namespace = response.keys.first
+      response_hash = response[namespace]
+      response_hash[:correlation_id]
+    end
+
+    def adjust_invoice(options)
+      request = AdjustInvoiceRequest.new(options)
+      unless request.has_required_attributes?
+        raise ArgumentError.new(request.missing_attributes_human_readable)
+      end
+      req = AdjustInvoiceRequestRepresenter.new(request).to_hash
+      operation = operation_with_name :AdjustInvoice
       operation.body = req
       response = operation.call.body
       if !response[:fault].nil?
