@@ -8,10 +8,18 @@ module Collector
   SERVICE_NAME        =   :InvoiceServiceV31
   PORT_NAME           =   :BasicHttpBinding_IInvoiceServiceV31
 
-  class InvoiceNotFoundError < RuntimeError ; end
-  class InvalidInvoiceStatusError < RuntimeError ; end
-  class InvalidTransactionAmountError < RuntimeError ; end
-  class AuthorizationFailedError < RuntimeError ; end
+  class CollectorError < RuntimeError
+    attr_reader :faultcode
+    def initialize(faultcode, message)
+      super(message)
+      @faultcode = faultcode
+    end
+  end
+
+  class InvoiceNotFoundError < CollectorError ; end
+  class InvalidInvoiceStatusError < CollectorError ; end
+  class InvalidTransactionAmountError < CollectorError ; end
+  class AuthorizationFailedError < CollectorError ; end
 
   class Client
     def initialize(user_name, password, sandbox = false)
@@ -30,7 +38,7 @@ module Collector
 
     def raise_error(response_hash)
       fault = response_hash[:fault]
-      err_class = RuntimeError
+      err_class = CollectorError
       case fault[:faultcode]
       when "s:INVOICE_NOT_FOUND"
         err_class = InvoiceNotFoundError
@@ -41,7 +49,8 @@ module Collector
       when "s:AUTHORIZATION_FAILED"
         err_class = AuthorizationFailedError
       end
-      raise err_class.send(:new, fault[:faultstring])
+      faultcode = fault[:faultcode].split(":").last
+      raise err_class.send(:new, faultcode, fault[:faultstring])
     end
 
     def validate_attributes(request_object)

@@ -23,4 +23,12 @@ describe "Collector::Client#get_address" do
       address.postal_code.should    eq "90737"
     end
   end
+  it "raises an error when handed an non-existing registration number" do
+    VCR.use_cassette('get_nonexisting_address') do
+      expect { @client.get_address(reg_no: "1602079955", store_id: "355") }.to raise_error{|err|
+        err.should be_a(Collector::CollectorError)
+        err.faultcode.should eq "INVALID_REGISTRATION_NUMBER"
+      }
+    end
+  end
 end

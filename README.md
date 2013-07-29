@@ -23,6 +23,19 @@ All calls to the Collector API are performed by instances of the `Collector::Cli
 
 	regular_client = Collector.new(user_name, password)
 	sandbox_client = Collector.new(user_name, password, true)
+	
+## Errors
+The `Client` object currently performs basic validation of all requests (checking that all required parameters are present), and raises an `ArgumentError` if the validation fails.
+
+If a call to the Collector API fails, an instance of `CollectorError` will be raised. This class has a property called `faultcode` which contains the error code as it appears in [the Collector documentation](https://commerce.collector.se/en/Integration/API/General/Error-codes/), e.g. `INVALID_REGISTRATION_NUMBER`. The full description returned by Collector is set as the error object's `message`.
+
+For some common Collector API errors, custom error classes are implemented. Currently these errors may be raised.
+
+    InvoiceNotFoundError
+	InvalidInvoiceStatusError
+	InvalidTransactionAmountError
+	
+These are subclasses of `CollectorError` and thus also have the `faultcode` property.
 
 ## Add Invoice
 
