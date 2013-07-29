@@ -44,84 +44,65 @@ module Collector
       raise err_class.send(:new, fault[:faultstring])
     end
 
-    def add_invoice(invoice_request)
-      unless invoice_request.has_required_attributes?
-        raise ArgumentError.new(invoice_request.missing_attributes_human_readable)
+    def validate_attributes(request_object)
+      unless request_object.has_required_attributes?
+        raise ArgumentError.new(request_object.missing_attributes_human_readable)
       end
-      operation = operation_with_name :AddInvoice
-      operation.body = InvoiceRequestRepresenter.new(invoice_request).to_hash
+    end
+
+    # operation_name is a symbol named as in the Collector API, eg :AddInvoice
+    # request is a hash or an object responding to to_hash
+    def perform_operation(operation_name, request)
+      operation = operation_with_name operation_name
+      operation.body = request.to_hash.with_indifferent_access
       response = operation.call.body
       raise_error(response) unless response[:fault].nil?
       namespace = response.keys.first
-      add_invoice_resp = InvoiceResponse.new(response[namespace])
-      add_invoice_resp
+      response[namespace].with_indifferent_access
+    end
+
+    def add_invoice(invoice_request)
+      validate_attributes(invoice_request)
+      resp = perform_operation(:AddInvoice, InvoiceRequestRepresenter.new(invoice_request))
+      InvoiceResponse.new(resp)
     end
 
     def get_address(options)
-      raise ArgumentError.new("Required parameter 'reg_no' missing.") unless !!options[:reg_no]
-      raise ArgumentError.new("Required parameter 'store_id' missing.") unless !!options[:store_id]
       request = GetAddressRequest.new(options.merge({country_code: "SE"}))
-      req = GetAddressRequestRepresenter.new(request).to_hash
-      operation = operation_with_name :GetAddress
-      operation.body = req
-      response = operation.call.body
-      raise_error(response) unless response[:fault].nil?
-      namespace = response.keys.first
-      user_hash = response[namespace].with_indifferent_access
+      validate_attributes(request)
+      resp = perform_operation(:GetAddress, GetAddressRequestRepresenter.new(request))
       user = User.new
-      UserRepresenter.new(user).from_hash(user_hash)
+      UserRepresenter.new(user).from_hash(resp)
       user
     end
 
     def cancel_invoice(options)
       request = CancelInvoiceRequest.new(options)
-      unless request.has_required_attributes?
-        raise ArgumentError.new(request.missing_attributes_human_readable)
-      end
-      req = CancelInvoiceRequestRepresenter.new(request).to_hash
-      operation = operation_with_name :CancelInvoice
-      operation.body = req
-      response = operation.call.body
-      raise_error(response) unless response[:fault].nil?
-      namespace = response.keys.first
-      response_hash = response[namespace]
-      response_hash[:correlation_id]
+      validate_attributes(request)
+      resp = perform_operation(:CancelInvoice, CancelInvoiceRequestRepresenter.new(request))
+      resp[:correlation_id]
     end
 
     def adjust_invoice(options)
       request = AdjustInvoiceRequest.new(options)
-      unless request.has_required_attributes?
-        raise ArgumentError.new(request.missing_attributes_human_readable)
-      end
-      req = AdjustInvoiceRequestRepresenter.new(request).to_hash
-      operation = operation_with_name :AdjustInvoice
-      operation.body = req
-      response = operation.call.body
-      raise_error(response) unless response[:fault].nil?
-      namespace = response.keys.first
-      response_hash = response[namespace]
-      response_hash[:correlation_id]
+      validate_attributes(request)
+      resp = perform_operation(:AdjustInvoice, AdjustInvoiceRequestRepresenter.new(request))
+      resp[:correlation_id]
     end
 
     def activate_invoice(options)
-      %w(invoice_no store_id country_code).each do |param|
-        if options[param.to_sym].nil?
-          raise ArgumentError.new("Required parameter #{param} missing.")
-        end
-      end
       request = ActivateInvoiceRequest.new(options)
+      validate_attributes(request)
       operation = nil
       if request.article_list.nil?
-        operation = operation_with_name :ActivateInvoice
-        operation.body = ActivateInvoiceRequestRepresenter.new(request).to_hash
+        operation = :ActivateInvoice
+        request = ActivateInvoiceRequestRepresenter.new(request)
       else
-        operation = operation_with_name :PartActivateInvoice
-        operation.body = PartActivateInvoiceRequestRepresenter.new(request).to_hash
+        operation = :PartActivateInvoice
+        request = PartActivateInvoiceRequestRepresenter.new(request)
       end
-      response = operation.call.body
-      raise_error(response) unless response[:fault].nil?
-      namespace = response.keys.first
-      InvoiceResponse.new(response[namespace])
+      resp = perform_operation(operation, request)
+      InvoiceResponse.new(resp)
     end
 
     def part_activate_invoice(options)
