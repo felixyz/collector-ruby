@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'vcr'
-require 'webmock/rspec'
 
 describe "Collector::Client#get_address" do
   before :all do
@@ -9,7 +8,7 @@ describe "Collector::Client#get_address" do
   it "performs a GetAddress request" do
     VCR.use_cassette('get_address') do
       user = @client.get_address(reg_no: "1602079954", store_id: "355")
-      user.should be_kind_of Collector::User
+      user.should                   be_kind_of Collector::User
       user.first_name.should        eq "Förnamnakt211"
       user.last_name.should         eq "Efternamnakt211"
       user.reg_no.should            eq "1602079954"

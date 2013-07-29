@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'vcr'
 
-describe "Collector::Client#cancel_invoice", focus: true do
+describe "Collector::Client#cancel_invoice" do
   before :all do
     @client = collector_client
   end
@@ -12,7 +12,7 @@ describe "Collector::Client#cancel_invoice", focus: true do
                        correlation_id: "test_cancel_invoice" )
 
   end
-  it "performs a CancelInvoice request", focus: true do
+  it "performs a CancelInvoice request" do
     VCR.use_cassette('cancel_invoice') do
       @invoice_no = add_original_invoice
       correlation_id = cancel_invoice(@invoice_no)

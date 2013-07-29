@@ -95,7 +95,7 @@ describe "Collector::Client#add_invoice" do
       @soap_request['lol0:RegNo'].should eq "1602079954"
       @soap_request['lol0:StoreId'].should eq "355"
       @soap_request['lol0:OrderDate'].should be_kind_of DateTime
-      @soap_request['lol0:OrderDate'].to_time.to_f.should be_within(1).of(DateTime.now.to_time.to_f)
+      @soap_request['lol0:OrderDate'].to_time.to_f.should be_within(2).of(DateTime.now.to_time.to_f)
     end
     it "includes the DeliveryAddress" do
       @address = @soap_request['lol0:DeliveryAddress']
