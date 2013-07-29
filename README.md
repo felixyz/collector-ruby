@@ -139,4 +139,4 @@ The returned `User` object has the following attributes:
 
     :first_name, :last_name, :reg_no, :addresses
 
-`addresses` is an array, but currently never contains at most one address. This operation is only available in Sweden, and an agreement with Collector is required for its use.
+`addresses` is an array, but currently contains at most one address. This operation is only available in Sweden, and an agreement with Collector is required for its use.
