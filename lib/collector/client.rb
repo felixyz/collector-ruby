@@ -74,25 +74,6 @@ module Collector
     end
 
     def cancel_invoice(options)
-      %w(invoice_no store_id country_code).each do |param|
-        if options[param.to_sym].nil?
-          raise ArgumentError.new("Required parameter #{param} missing.")
-        end
-      end
-      request = CancelInvoiceRequest.new(options)
-      req = CancelInvoiceRequestRepresenter.new(request).to_hash
-      operation = operation_with_name :CancelInvoice
-      operation.body = req
-      response = operation.call.body
-      if !response[:fault].nil?
-        raise_error(response)
-      end
-      namespace = response.keys.first
-      response_hash = response[namespace]
-      response_hash[:correlation_id]
-    end
-
-    def cancel_invoice(options)
       request = CancelInvoiceRequest.new(options)
       unless request.has_required_attributes?
         raise ArgumentError.new(request.missing_attributes_human_readable)
