@@ -2,17 +2,6 @@ require 'spec_helper'
 require 'vcr'
 
 describe "Collector::Client" do
-  let (:product1) { sandbox_invoice_row(article_id: 101, unit_price: 47.5, quantity: 1) }
-  let (:product2) { sandbox_invoice_row(article_id: 102, unit_price: 61.75, quantity: 2) }
-  let (:product3) { sandbox_invoice_row(article_id: 103, unit_price: 73.15, quantity: 1) }
-
-  def add_original_invoice
-    req = sandbox_invoice_request
-    req.invoice_rows = [product1, product2, product3]
-    response = @client.add_invoice(req)
-    @invoice_no = response.invoice_no
-  end
-
   # TODO: Should be a shared example, but hard to make it fit
   def spec_correct_response(response)
     response.should be_kind_of Collector::InvoiceResponse
@@ -28,11 +17,11 @@ describe "Collector::Client" do
     @client = collector_client
   end
 
-  context "#activate_invoice", focus: true do
+  context "#activate_invoice" do
 
     it "performs an ActivateInvoice request" do
       VCR.use_cassette('activate_invoice') do
-        add_original_invoice
+        @invoice_no = add_original_invoice
         response = @client.activate_invoice(invoice_no: @invoice_no,
                                             store_id: "355",
                                             country_code: "SE",
@@ -56,14 +45,14 @@ describe "Collector::Client" do
                     article_list: [@item])
     end
     it "requires the article_list parameter" do
-      VCR.use_cassette('part_activate_invoice', :record => :new_episodes) { add_original_invoice }
+      VCR.use_cassette('part_activate_invoice', :record => :new_episodes) { @invoice_no = add_original_invoice }
       expect {
           @client.part_activate_invoice(invoice_no: @invoice_no, store_id: "355", country_code: "SE")
         }.to raise_error ArgumentError
     end
     it "performs a PartActivateInvoice request" do
       VCR.use_cassette('part_activate_invoice', :record => :new_episodes) do
-        add_original_invoice
+        @invoice_no = add_original_invoice
         part_activate
         spec_correct_response(@response)
         @response.correlation_id.should eq "testing_part_activate_invoice"
@@ -72,7 +61,7 @@ describe "Collector::Client" do
     end
     it "returns the new invoice number" do
       VCR.use_cassette('part_activate_invoice', :record => :new_episodes) do
-        add_original_invoice
+        @invoice_no = add_original_invoice
         part_activate
         @response.new_invoice_no.should_not be_nil
       end

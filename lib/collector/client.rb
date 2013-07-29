@@ -6,6 +6,8 @@ module Collector
   CollectorUrl = 'https://eCommerceTest.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
   ServiceName =  :InvoiceServiceV31
   PortName =     :BasicHttpBinding_IInvoiceServiceV31
+  class InvoiceNotFoundError < RuntimeError ; end
+  class InvalidInvoiceStatusError < RuntimeError ; end
 
   class Client
     def initialize(user_name, password)
@@ -19,6 +21,18 @@ module Collector
       @savon.operation(ServiceName, PortName, operation_name).tap do |operation|
         operation.header = @header
       end
+    end
+
+    def raise_error(response_hash)
+      fault = response_hash[:fault]
+      err_class = RuntimeError
+      case fault[:faultcode]
+      when "s:INVOICE_NOT_FOUND"
+        err_class = InvoiceNotFoundError
+      when "s:INVALID_INVOICE_STATUS"
+        err_class = InvalidInvoiceStatusError
+      end
+      raise err_class.send(:new, fault[:faultstring])
     end
 
     def add_invoice(invoice_request)
@@ -55,6 +69,25 @@ module Collector
       user
     end
 
+    def cancel_invoice(options)
+      %w(invoice_no store_id country_code).each do |param|
+        if options[param.to_sym].nil?
+          raise ArgumentError.new("Required parameter #{param} missing.")
+        end
+      end
+      request = CancelInvoiceRequest.new(options)
+      req = CancelInvoiceRequestRepresenter.new(request).to_hash
+      operation = operation_with_name :CancelInvoice
+      operation.body = req
+      response = operation.call.body
+      if !response[:fault].nil?
+        raise_error(response)
+      end
+      namespace = response.keys.first
+      response_hash = response[namespace]
+      response_hash[:correlation_id]
+    end
+
     def activate_invoice(options)
       %w(invoice_no store_id country_code).each do |param|
         if options[param.to_sym].nil?
@@ -72,7 +105,7 @@ module Collector
       end
       response = operation.call.body
       if !response[:fault].nil?
-        raise response[:fault].to_s
+        raise_error(response)
       end
       namespace = response.keys.first
       InvoiceResponse.new(response[namespace])
