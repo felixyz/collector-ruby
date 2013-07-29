@@ -3,9 +3,10 @@ require 'active_support/core_ext'
 
 module Collector
 
-  CollectorUrl = 'https://eCommerceTest.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
-  ServiceName =  :InvoiceServiceV31
-  PortName =     :BasicHttpBinding_IInvoiceServiceV31
+  COLLECTOR_URL  =  'https://eCommerceTest.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
+  SERVICE_NAME   =   :InvoiceServiceV31
+  PORT_NAME      =   :BasicHttpBinding_IInvoiceServiceV31
+
   class InvoiceNotFoundError < RuntimeError ; end
   class InvalidInvoiceStatusError < RuntimeError ; end
 
@@ -14,11 +15,11 @@ module Collector
       @header = {"ClientIpAddress" => "?",
                       "Username" => user_name,
                       "Password" => password }
-      @savon = Savon.new(CollectorUrl)
+      @savon = Savon.new(COLLECTOR_URL)
     end
 
     def operation_with_name(operation_name)
-      @savon.operation(ServiceName, PortName, operation_name).tap do |operation|
+      @savon.operation(SERVICE_NAME, PORT_NAME, operation_name).tap do |operation|
         operation.header = @header
       end
     end
