@@ -23,7 +23,7 @@ def collector_client
   password = 'blingo_test'
   client = nil
   VCR.use_cassette('create_client') do
-    client = Collector.new(user_name, password)
+    client = Collector.new(user_name, password, true)
   end
   client
 end

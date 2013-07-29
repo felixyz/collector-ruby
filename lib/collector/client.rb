@@ -3,20 +3,23 @@ require 'active_support/core_ext'
 
 module Collector
 
-  COLLECTOR_URL  =  'https://eCommerceTest.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
-  SERVICE_NAME   =   :InvoiceServiceV31
-  PORT_NAME      =   :BasicHttpBinding_IInvoiceServiceV31
+  COLLECTOR_URL       =  'https://ecommerce.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
+  COLLECTOR_URL_TEST  =  'https://eCommerceTest.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
+  SERVICE_NAME        =   :InvoiceServiceV31
+  PORT_NAME           =   :BasicHttpBinding_IInvoiceServiceV31
 
   class InvoiceNotFoundError < RuntimeError ; end
   class InvalidInvoiceStatusError < RuntimeError ; end
   class InvalidTransactionAmountError < RuntimeError ; end
+  class AuthorizationFailedError < RuntimeError ; end
 
   class Client
-    def initialize(user_name, password)
+    def initialize(user_name, password, sandbox = false)
       @header = {"ClientIpAddress" => "?",
                       "Username" => user_name,
                       "Password" => password }
-      @savon = Savon.new(COLLECTOR_URL)
+      url = sandbox ? COLLECTOR_URL_TEST : COLLECTOR_URL
+      @savon = Savon.new(url)
     end
 
     def operation_with_name(operation_name)
@@ -35,6 +38,8 @@ module Collector
         err_class = InvalidInvoiceStatusError
       when "s:INVALID_TRANSACTION_AMOUNT"
         err_class = InvalidTransactionAmountError
+      when "s:AUTHORIZATION_FAILED"
+        err_class = AuthorizationFailedError
       end
       raise err_class.send(:new, fault[:faultstring])
     end
@@ -46,10 +51,7 @@ module Collector
       operation = operation_with_name :AddInvoice
       operation.body = InvoiceRequestRepresenter.new(invoice_request).to_hash
       response = operation.call.body
-      # TODO: Exception class, and proper information extraction
-      if !response[:fault].nil?
-        raise response[:fault].to_s
-      end
+      raise_error(response) unless response[:fault].nil?
       namespace = response.keys.first
       add_invoice_resp = InvoiceResponse.new(response[namespace])
       add_invoice_resp
@@ -63,9 +65,7 @@ module Collector
       operation = operation_with_name :GetAddress
       operation.body = req
       response = operation.call.body
-      if !response[:fault].nil?
-        raise response[:fault].to_s
-      end
+      raise_error(response) unless response[:fault].nil?
       namespace = response.keys.first
       user_hash = response[namespace].with_indifferent_access
       user = User.new
@@ -82,9 +82,7 @@ module Collector
       operation = operation_with_name :CancelInvoice
       operation.body = req
       response = operation.call.body
-      if !response[:fault].nil?
-        raise_error(response)
-      end
+      raise_error(response) unless response[:fault].nil?
       namespace = response.keys.first
       response_hash = response[namespace]
       response_hash[:correlation_id]
@@ -99,9 +97,7 @@ module Collector
       operation = operation_with_name :AdjustInvoice
       operation.body = req
       response = operation.call.body
-      if !response[:fault].nil?
-        raise_error(response)
-      end
+      raise_error(response) unless response[:fault].nil?
       namespace = response.keys.first
       response_hash = response[namespace]
       response_hash[:correlation_id]
@@ -123,9 +119,7 @@ module Collector
         operation.body = PartActivateInvoiceRequestRepresenter.new(request).to_hash
       end
       response = operation.call.body
-      if !response[:fault].nil?
-        raise_error(response)
-      end
+      raise_error(response) unless response[:fault].nil?
       namespace = response.keys.first
       InvoiceResponse.new(response[namespace])
     end

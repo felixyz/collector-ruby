@@ -18,6 +18,12 @@ And then execute:
     $ bundle
 
 # Usage
+## Initializing the client
+All calls to the Collector API are performed by instances of the `Collector::Client` class. The client has no state apart from the configuration parameters passed when initializing it. The initializer requires the user name and password, and an optional third parameter specifies whether to use the sandbox environment.
+
+	regular_client = Collector.new(user_name, password)
+	sandbox_client = Collector.new(user_name, password, true)
+
 ## Add Invoice
 
 	require 'collector'
