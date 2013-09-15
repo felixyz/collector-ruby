@@ -99,6 +99,13 @@ module Collector
       resp[:correlation_id]
     end
 
+    def replace_invoice(options)
+      request = ReplaceInvoiceRequest.new(options)
+      validate_attributes(request)
+      resp = perform_operation(:ReplaceInvoice, ReplaceInvoiceRequestRepresenter.new(request))
+      InvoiceResponse.new(resp)
+    end
+
     def activate_invoice(options)
       request = ActivateInvoiceRequest.new(options)
       validate_attributes(request)

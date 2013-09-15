@@ -23,7 +23,7 @@ All calls to the Collector API are performed by instances of the `Collector::Cli
 
 	regular_client = Collector.new(user_name, password)
 	sandbox_client = Collector.new(user_name, password, true)
-	
+
 ## Errors
 The `Client` object currently performs basic validation of all requests (checking that all required parameters are present), and raises an `ArgumentError` if the validation fails.
 
@@ -34,7 +34,7 @@ For some common Collector API errors, custom error classes are implemented. Curr
     InvoiceNotFoundError
 	InvalidInvoiceStatusError
 	InvalidTransactionAmountError
-	
+
 These are subclasses of `CollectorError` and thus also have the `faultcode` property.
 
 ## Add Invoice
@@ -111,6 +111,22 @@ Whichever method is used, the same parameters are expected and the response is i
 `ArticleListItem` instances can also be initialized from `InvoiceRow` objects:
 
     item = Collector::ArticleListItem.new(invoice_row)
+
+## Replace Invoice
+
+Also returns an instance of `Collector::InvoiceResponse`, but with values for only the following fields: `CorrelationId`, `AvailableReservationAmount`, `TotalAmount`, `InvoiceStatus`.
+
+	new_invoice_row = Collector::InvoiceRow.new(
+		                article_id: 123,
+		                description: "A new shiny gadget",
+		                quantity: "2",
+		                unit_price: 250.0,
+		                vat: 2.0)
+	response = @client.replace_invoice(invoice_no: invoice_no,
+	                                     store_id: "355",
+	                                 country_code: "SE",
+	                               correlation_id: "testing_replace_invoice",
+	                                 invoice_rows: [new_row])
 
 ## Adjust Invoice
 
