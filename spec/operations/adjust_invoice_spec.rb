@@ -4,8 +4,8 @@ require 'vcr'
 describe "Collector::Client#adjust_invoice" do
   before :each do
     @client = collector_client
-    @product = product2
-    @item = Collector::ArticleListItem.new(@product)
+    product = product2
+    @item = Collector::ArticleListItem.new(product)
   end
   def activate_invoice(invoice_no)
     @client.activate_invoice(invoice_no: invoice_no,
