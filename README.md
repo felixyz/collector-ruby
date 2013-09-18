@@ -114,7 +114,7 @@ Whichever method is used, the same parameters are expected and the response is i
 
 ## Replace Invoice
 
-Also returns an instance of `Collector::InvoiceResponse`, but with values for only the following fields: `CorrelationId`, `AvailableReservationAmount`, `TotalAmount`, `InvoiceStatus`.
+Also returns an instance of `Collector::InvoiceResponse`, but with values for only the following fields: `CorrelationId`, `AvailableReservationAmount`, `TotalAmount`, `InvoiceStatus`. This operation does **not** create a new invoice number.
 
 	new_invoice_row = Collector::InvoiceRow.new(
 		                article_id: 123,
