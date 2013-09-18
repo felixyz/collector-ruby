@@ -27,7 +27,6 @@ describe "Collector::Client#replace_invoice" do
   it "performs a ReplaceInvoice request" do
     VCR.use_cassette('replace_invoice') do
       invoice_no = add_original_invoice
-      # activate_invoice(invoice_no)
       response = replace_invoice(invoice_no, new_rows)
       response.correlation_id.should eq "testing_replace_invoice"
       response.total_amount.to_f.should eq new_rows.inject(0) { |acc, row|
