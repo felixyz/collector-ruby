@@ -27,7 +27,9 @@ module Collector
                       "Username" => user_name,
                       "Password" => password }
       url = sandbox ? COLLECTOR_URL_TEST : COLLECTOR_URL
-      @savon = Savon.new(url)
+      http = Savon::HTTPClient.new
+      http.client.ssl_config.ssl_version = 'TLSv1'
+      @savon = Savon.new(url, http)
     end
 
     def operation_with_name(operation_name)
