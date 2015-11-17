@@ -1,21 +1,33 @@
 # Collector::Ruby
 
-This gem provides an interface to the Collector API.
+This gem provides an interface to the [Collector SOAP API](https://commerce.collector.se/en/Integration/API/) for payments handling.
 
 __Important__: `collector-ruby` depends on the unfinished version 3 of Savon, and therefore users of this gem must also include this in their Gemfile:
 
     gem 'savon', :github => "savonrb/savon", :branch => "master"
 
+*NOTE: `collector-ruby` will soon be updated to use Savon's successor.*
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'collector-ruby', :github => "blingo/collector-ruby", :branch => "master"
+    gem 'collector-ruby'
 
 And then execute:
 
     $ bundle
+
+Or install it yourself:
+
+	$ gem install collector-ruby
+	
+
+Inside of your Ruby program, require collector-ruby:
+
+	require 'collector-ruby'
+
+__Important__: See note above about adding Savon to your app's dependencies.
 
 # Usage
 ## Initializing the client
@@ -25,7 +37,7 @@ All calls to the Collector API are performed by instances of the `Collector::Cli
 	sandbox_client = Collector.new(user_name, password, true)
 
 ## Errors
-The `Client` object currently performs basic validation of all requests (checking that all required parameters are present), and raises an `ArgumentError` if the validation fails.
+The `Client` object performs basic validation of all requests (checking that all required parameters are present), and raises an `ArgumentError` if the validation fails.
 
 If a call to the Collector API fails, an instance of `CollectorError` will be raised. This class has a property called `faultcode` which contains the error code as it appears in [the Collector documentation](https://commerce.collector.se/en/Integration/API/General/Error-codes/), e.g. `INVALID_REGISTRATION_NUMBER`. The full description returned by Collector is set as the error object's `message`.
 
