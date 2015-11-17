@@ -2,7 +2,6 @@ require 'savon'
 require 'active_support/core_ext'
 
 module Collector
-
   COLLECTOR_URL       =  'https://ecommerce.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
   COLLECTOR_URL_TEST  =  'https://eCommerceTest.collector.se/v3.0/InvoiceServiceV31.svc?wsdl'
   SERVICE_NAME        =   :InvoiceServiceV31
@@ -16,16 +15,16 @@ module Collector
     end
   end
 
-  class InvoiceNotFoundError < CollectorError ; end
-  class InvalidInvoiceStatusError < CollectorError ; end
-  class InvalidTransactionAmountError < CollectorError ; end
-  class AuthorizationFailedError < CollectorError ; end
+  class InvoiceNotFoundError < CollectorError; end
+  class InvalidInvoiceStatusError < CollectorError; end
+  class InvalidTransactionAmountError < CollectorError; end
+  class AuthorizationFailedError < CollectorError; end
 
   class Client
     def initialize(user_name, password, sandbox = false)
-      @header = {"ClientIpAddress" => "?",
-                      "Username" => user_name,
-                      "Password" => password }
+      @header = { 'ClientIpAddress' => '?',
+                  'Username' => user_name,
+                  'Password' => password }
       url = sandbox ? COLLECTOR_URL_TEST : COLLECTOR_URL
       http = Savon::HTTPClient.new
       http.client.ssl_config.ssl_version = 'TLSv1'
@@ -42,22 +41,22 @@ module Collector
       fault = response_hash[:fault]
       err_class = CollectorError
       case fault[:faultcode]
-      when "s:INVOICE_NOT_FOUND"
+      when 's:INVOICE_NOT_FOUND'
         err_class = InvoiceNotFoundError
-      when "s:INVALID_INVOICE_STATUS"
+      when 's:INVALID_INVOICE_STATUS'
         err_class = InvalidInvoiceStatusError
-      when "s:INVALID_TRANSACTION_AMOUNT"
+      when 's:INVALID_TRANSACTION_AMOUNT'
         err_class = InvalidTransactionAmountError
-      when "s:AUTHORIZATION_FAILED"
+      when 's:AUTHORIZATION_FAILED'
         err_class = AuthorizationFailedError
       end
-      faultcode = fault[:faultcode].split(":").last
-      raise err_class.send(:new, faultcode, fault[:faultstring])
+      faultcode = fault[:faultcode].split(':').last
+      fail err_class.send(:new, faultcode, fault[:faultstring])
     end
 
     def validate_attributes(request_object)
       unless request_object.has_required_attributes?
-        raise ArgumentError.new(request_object.missing_attributes_human_readable)
+        fail ArgumentError.new(request_object.missing_attributes_human_readable)
       end
     end
 
@@ -79,7 +78,7 @@ module Collector
     end
 
     def get_address(options)
-      request = GetAddressRequest.new(options.merge({country_code: "SE"}))
+      request = GetAddressRequest.new(options.merge(country_code: 'SE'))
       validate_attributes(request)
       resp = perform_operation(:GetAddress, GetAddressRequestRepresenter.new(request))
       user = User.new
@@ -125,7 +124,7 @@ module Collector
 
     def part_activate_invoice(options)
       if options[:article_list].nil?
-        raise ArgumentError.new("Required parameter article_list missing.")
+        fail ArgumentError.new('Required parameter article_list missing.')
       end
       activate_invoice(options)
     end

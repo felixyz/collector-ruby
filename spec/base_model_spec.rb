@@ -15,28 +15,30 @@ class TolerantModel < Collector::BaseModel
 end
 
 describe Collector::BaseModel do
-  it "raises an error when initialized with undeclared attributes" do
-    expect{ Model.new(required1: true,
-                      required2: true,
-                      unsupported: true)}.to raise_error ArgumentError
+  it 'raises an error when initialized with undeclared attributes' do
+    expect do
+      Model.new(required1: true,
+                required2: true,
+                unsupported: true)
+    end.to raise_error ArgumentError
   end
-  it "does not raise an error for undeclared attributes if set to swallow those" do
-    expect{ TolerantModel.new(humbug: true) }.not_to raise_error
+  it 'does not raise an error for undeclared attributes if set to swallow those' do
+    expect { TolerantModel.new(humbug: true) }.not_to raise_error
   end
-  it "reports presence of required attributes" do
+  it 'reports presence of required attributes' do
     obj = Model.new(required1: true, required2: true)
     obj.should have_required_attributes
     obj.missing_attributes.should be_empty
   end
-  it "reports absence of required attributes" do
+  it 'reports absence of required attributes' do
     obj = Model.new(required1: true, optional1: true, optional2: true)
     obj.should_not have_required_attributes
     obj.missing_attributes.should eq [:required2]
   end
-  it "reports absence of required attributes in nested objects" do
+  it 'reports absence of required attributes in nested objects' do
     nested = NestedModel.new(optional: true)
     obj = Model.new(required1: true, required2: nested, optional1: nested)
     obj.should_not have_required_attributes
-    obj.missing_attributes.should eq [{required2: [:required]}, {optional1: [:required]}]
+    obj.missing_attributes.should eq [{ required2: [:required] }, { optional1: [:required] }]
   end
 end

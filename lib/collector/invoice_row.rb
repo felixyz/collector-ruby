@@ -8,11 +8,10 @@ module Collector
   class InvoiceRowRepresenter < Representable::Decorator
     include Representable::Hash
 
-    property :article_id,   as: "ArticleId"
-    property :description,  as: "Description"
-    property :quantity,     as: "Quantity"
-    property :unit_price,   as: "UnitPrice"
-    property :vat,          as: "VAT"
+    property :article_id,   as: 'ArticleId'
+    property :description,  as: 'Description'
+    property :quantity,     as: 'Quantity'
+    property :unit_price,   as: 'UnitPrice'
+    property :vat,          as: 'VAT'
   end
-
 end

@@ -31,9 +31,11 @@ end
 def product1
   @product1 ||= sandbox_invoice_row(article_id: 101, unit_price: 47.5, quantity: 1)
 end
+
 def product2
   @product2 ||= sandbox_invoice_row(article_id: 102, unit_price: 61.75, quantity: 2)
 end
+
 def product3
   @product3 ||= sandbox_invoice_row(article_id: 103, unit_price: 73.15, quantity: 1)
 end

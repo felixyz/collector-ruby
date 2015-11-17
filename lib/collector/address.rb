@@ -3,10 +3,10 @@ require 'representable/hash'
 module Collector
   class Address < BaseModel
     attributes :address1, :city,
-      :country_code, :postal_code
+               :country_code, :postal_code
     attributes_opt :address2, :co_address, :cell_phone_number,
-      :company_name, :email, :first_name,
-      :last_name, :phone_number
+                   :company_name, :email, :first_name,
+                   :last_name, :phone_number
   end
 
   class AddressRepresenter < Representable::Decorator

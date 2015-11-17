@@ -10,16 +10,16 @@ module Collector
   class UserRepresenter < Representable::Decorator
     include Representable::Hash
 
-    property    :first_name,        as: :firstname
-    property    :last_name,         as: :lastname
-    property    :reg_no
-    property    :addresses,
-                reader: lambda {|doc, args|
-                  addresses = doc[:addresses]
-                  doc[:addresses] = [addresses] unless addresses.kind_of? Array
-                  self.addresses = addresses.map{|key, adr|
-                    key == "base_address" ? Address.new(adr) : nil
-                  }.compact
-                }
+    property :first_name,        as: :firstname
+    property :last_name,         as: :lastname
+    property :reg_no
+    property :addresses,
+             reader: lambda {|doc, _args|
+               addresses = doc[:addresses]
+               doc[:addresses] = [addresses] unless addresses.is_a? Array
+               self.addresses = addresses.map{|key, adr|
+                 key == 'base_address' ? Address.new(adr) : nil
+               }.compact
+             }
   end
 end
