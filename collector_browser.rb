@@ -14,7 +14,10 @@ PortName =     :BasicHttpBinding_IInvoiceServiceV31
 default_command :menu
 
 def client
-  @savon ||= Savon.new(CollectorUrl)
+  return @savon if @savon
+  http = Savon::HTTPClient.new
+  http.client.ssl_config.ssl_version = 'TLSv1'
+  @savon = Savon.new(CollectorUrl, http)
 end
 
 def operations
