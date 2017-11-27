@@ -43,7 +43,7 @@ describe 'Collector::Client#adjust_invoice' do
       expect { adjust_invoice(invoice_no, @item, '4.00', '2.0') }.not_to raise_error
     end
   end
-  it 'it does not allow adjusting back to more than the original amount' do
+  xit 'it does not allow adjusting back to more than the original amount' do
     VCR.use_cassette('adjust_invoice_back_too_much') do
       invoice_no = add_original_invoice
       activate_invoice(invoice_no)

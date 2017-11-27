@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'virtus', '>= 0.5.0'
-  spec.add_runtime_dependency 'representable'
+  spec.add_runtime_dependency 'representable', '~> 2.4.1'
   spec.add_runtime_dependency 'activesupport'
 
   spec.add_development_dependency 'bundler', '~> 1.3'
